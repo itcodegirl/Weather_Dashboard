@@ -15,13 +15,47 @@ import axios from 'axios';
 const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
 const BASE_URL = process.env.REACT_APP_WEATHER_BASE_URL;
 
+const inchesFromMm = (mm) => (mm / 25.4).toFixed(2);
+
+const getRainSummary = (forecast) => {
+  const rainyItems = forecast.filter((item) => item.rain && item.rain['3h']);
+
+  const totalRainMm = rainyItems.reduce((sum, item) => {
+    return sum + item.rain['3h'];
+  }, 0);
+
+  const nextRain = rainyItems[0];
+
+  let intensity = 'No significant rain';
+  if (totalRainMm > 0 && totalRainMm < 2.5) intensity = 'Light rain expected';
+  if (totalRainMm >= 2.5 && totalRainMm < 10) intensity = 'Moderate rain expected';
+  if (totalRainMm >= 10) intensity = 'Heavy rain expected';
+
+  return {
+    totalRainMm,
+    totalRainIn: inchesFromMm(totalRainMm),
+    nextRainTime: nextRain
+      ? new Date(nextRain.dt_txt).toLocaleString('en-US', {
+          weekday: 'short',
+          hour: 'numeric',
+          minute: '2-digit',
+        })
+      : 'No rain in forecast window',
+    intensity,
+    rainyPeriods: rainyItems.length,
+  };
+};
+
 function App() {
+  
   const [city, setCity] = useState('');
   const [submittedCity, setSubmittedCity] = useState('Chicago');
   const [currentWeather, setCurrentWeather] = useState(null);
   const [forecast, setForecast] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const rainSummary = getRainSummary(forecast);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -118,106 +152,138 @@ function App() {
         )}
 
         {!loading && !error && currentWeather && (
-          <main className="dashboard-grid">
-            <section className="card current-weather">
-              <div className="card-top">
-                <div>
-                  <p className="section-label">Current Conditions</p>
-                  <h2>
-                    <MapPin size={18} />
-                    {currentWeather.name}, {currentWeather.sys.country}
-                  </h2>
-                </div>
+  <main className="dashboard-grid">
+    <section className="card current-weather">
+      <div className="card-top">
+        <div>
+          <p className="section-label">Current Conditions</p>
+          <h2>
+            <MapPin size={18} />
+            {currentWeather.name}, {currentWeather.sys.country}
+          </h2>
+        </div>
 
-                <div className="weather-badge">
-                  <CloudSun size={18} />
-                  <span>{currentWeather.weather[0].description}</span>
-                </div>
-              </div>
+        <div className="weather-badge">
+          <CloudSun size={18} />
+          <span>{currentWeather.weather[0].description}</span>
+        </div>
+      </div>
 
-              <div className="temperature-row">
-                <div className="temperature">
-                  {Math.round(currentWeather.main.temp)}°
-                </div>
-                <div className="temperature-meta">
-                  <p>Feels like {Math.round(currentWeather.main.feels_like)}°</p>
-                  <p>
-                    H: {Math.round(currentWeather.main.temp_max)}° / L:{' '}
-                    {Math.round(currentWeather.main.temp_min)}°
-                  </p>
-                </div>
-              </div>
+      <div className="temperature-row">
+        <div className="temperature">
+          {Math.round(currentWeather.main.temp)}°
+        </div>
+        <div className="temperature-meta">
+          <p>Feels like {Math.round(currentWeather.main.feels_like)}°</p>
+          <p>
+            H: {Math.round(currentWeather.main.temp_max)}° / L:{' '}
+            {Math.round(currentWeather.main.temp_min)}°
+          </p>
+        </div>
+      </div>
 
-              <div className="stats-grid">
-                <div className="stat-card">
-                  <Droplets size={18} />
-                  <div>
-                    <span>Humidity</span>
-                    <strong>{currentWeather.main.humidity}%</strong>
-                  </div>
-                </div>
+      <div className="stats-grid">
+        <div className="stat-card">
+          <Droplets size={18} />
+          <div>
+            <span>Humidity</span>
+            <strong>{currentWeather.main.humidity}%</strong>
+          </div>
+        </div>
 
-                <div className="stat-card">
-                  <Wind size={18} />
-                  <div>
-                    <span>Wind</span>
-                    <strong>{Math.round(currentWeather.wind.speed)} mph</strong>
-                  </div>
-                </div>
+        <div className="stat-card">
+          <Wind size={18} />
+          <div>
+            <span>Wind</span>
+            <strong>{Math.round(currentWeather.wind.speed)} mph</strong>
+          </div>
+        </div>
 
-                <div className="stat-card">
-                  <Gauge size={18} />
-                  <div>
-                    <span>Pressure</span>
-                    <strong>{currentWeather.main.pressure} hPa</strong>
-                  </div>
-                </div>
+        <div className="stat-card">
+          <Gauge size={18} />
+          <div>
+            <span>Pressure</span>
+            <strong>{currentWeather.main.pressure} hPa</strong>
+          </div>
+        </div>
 
-                <div className="stat-card">
-                  <Eye size={18} />
-                  <div>
-                    <span>Visibility</span>
-                    <strong>
-                      {(currentWeather.visibility / 1609).toFixed(1)} mi
-                    </strong>
-                  </div>
-                </div>
-              </div>
-            </section>
+        <div className="stat-card">
+          <Eye size={18} />
+          <div>
+            <span>Visibility</span>
+            <strong>
+              {(currentWeather.visibility / 1609).toFixed(1)} mi
+            </strong>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <section className="card forecast-card">
-              <div className="card-header">
-                <p className="section-label">5-Day Forecast</p>
-                <Sun size={18} />
-              </div>
+    <section className="card forecast-card">
+      <div className="card-header">
+        <p className="section-label">5-Day Forecast</p>
+        <Sun size={18} />
+      </div>
 
-              <div className="forecast-list">
-                {forecast.map((item) => (
-                  <article className="forecast-item" key={item.dt}>
-                    <div>
-                      <h3>
-                        {new Date(item.dt_txt).toLocaleDateString('en-US', {
-                          weekday: 'short',
-                        })}
-                      </h3>
-                      <p>{item.weather[0].description}</p>
-                    </div>
+      <div className="forecast-list">
+        {forecast.map((item) => (
+          <article className="forecast-item" key={item.dt}>
+            <div>
+              <h3>
+                {new Date(item.dt_txt).toLocaleDateString('en-US', {
+                  weekday: 'short',
+                })}
+              </h3>
+              <p>{item.weather[0].description}</p>
+            </div>
 
-                    <div className="forecast-right">
-                      <img
-                        src={`https://openweathermap.org/img/wn/${item.weather[0].icon}.png`}
-                        alt={item.weather[0].description}
-                        width="42"
-                        height="42"
-                      />
-                      <strong>{Math.round(item.main.temp)}°</strong>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-          </main>
-        )}
+            <div className="forecast-right">
+              <img
+                src={`https://openweathermap.org/img/wn/${item.weather[0].icon}.png`}
+                alt={item.weather[0].description}
+                width="42"
+                height="42"
+              />
+              <strong>{Math.round(item.main.temp)}°</strong>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section className="card rain-card">
+      <div className="card-header">
+        <p className="section-label">Rain Outlook</p>
+        <CloudSun size={18} />
+      </div>
+
+      <div className="rain-summary">
+        <div className="rain-total">
+          <span className="rain-eyebrow">Expected Rain</span>
+          <strong>{rainSummary.totalRainIn}"</strong>
+          <p>({rainSummary.totalRainMm.toFixed(1)} mm in forecast window)</p>
+        </div>
+
+        <div className="rain-details">
+          <div className="rain-detail-item">
+            <span>Intensity</span>
+            <strong>{rainSummary.intensity}</strong>
+          </div>
+
+          <div className="rain-detail-item">
+            <span>Next Rain</span>
+            <strong>{rainSummary.nextRainTime}</strong>
+          </div>
+
+          <div className="rain-detail-item">
+            <span>Rainy Periods</span>
+            <strong>{rainSummary.rainyPeriods}</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+)}
       </div>
     </div>
   );
