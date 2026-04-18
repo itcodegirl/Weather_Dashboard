@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Jenna Zawaski | Frontend Developer</title>
+
+	<!-- Fonts -->
+	<link
+		href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap"
+		rel="stylesheet">
+
+	<!-- Three.js (for desktop WebGL only) -->
+	<script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
+
+	<!-- GSAP -->
+	<script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
+	<script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+
+	<!-- Styles -->
+	<link rel="stylesheet" href="css/styles.css?v=1.0" />
+</head>
+
+<body class="no-scroll">
+
+	<!-- INTRO VIDEO -->
+	<div class="intro-video">
+		<video autoplay muted playsinline id="introVideo">
+			<source src="assets/intro.mp4" type="video/mp4" />
+		</video>
+	</div>
+
+	<!-- NAVIGATION -->
+	<header class="nav nav-show">
+		<div class="nav-inner">
+			<div class="logo">JZ</div>
+			<nav>
+				<a href="#work">Work</a>
+				<a href="#skills">Skills</a>
+				<a href="#about">About</a>
+				<a href="#contact">Contact</a>
+			</nav>
+		</div>
+	</header>
+
+	<!-- HERO SECTION -->
+	<section class="hero">
+		<div class="hero-container">
+
+			<!-- HERO CONTENT -->
+			<div class="hero-content">
+				<h1 class="hero-title">Frontend Developer & UX Engineer</h1>
+				<p class="hero-sub">
+					Designing and building cinematic, interactive web experiences.
+				</p>
+			</div>
+
+			<!-- HERO PORTRAIT — Auto-switches WebGL or fallback -->
+			<div class="hero-visual">
+				<div id="portrait-container">
+
+					<!-- Smart fallback image system -->
+					<picture id="portrait-fallback">
+						<source srcset="assets/images/Jenna_robot_1_mobile.webp" type="image/webp">
+
+						<source srcset="assets/images/Jenna_robot_1_mobile@2x.jpg"
+							media="(min-device-pixel-ratio: 2) and (max-width: 900px)">
+
+						<source srcset="assets/images/Jenna_robot_1_mobile.jpg" media="(max-width: 900px)">
+
+						<img src="assets/images/Jenna_robot_1.jpg" alt="Portrait" class="portrait-static" />
+					</picture>
+
+					<!-- WebGL canvas is injected here by JS on desktop -->
+				</div>
+			</div>
+
+		</div>
+	</section>
+
+	<!-- WORK SECTION -->
+	<section id="work" class="work">
+		<h2>Selected Work</h2>
+		<div class="work-grid">
+			<!-- your project cards (unchanged) -->
+		</div>
+	</section>
+
+	<div class="section-divider"></div>
+
+	<!-- SKILLS SECTION -->
+	<section id="skills" class="skills">
+		<h2>Skills & Evolution</h2>
+		<div class="skills-timeline">
+			<!-- your skill items -->
+		</div>
+	</section>
+
+	<div class="section-divider"></div>
+
+	<!-- ABOUT SECTION -->
+	<section id="about" class="about">
+		<h2>About</h2>
+		<p class="about-text">
+			<!-- Your text -->
+		</p>
+	</section>
+
+	<div class="section-divider"></div>
+
+	<!-- CONTACT SECTION -->
+	<section id="contact" class="contact">
+		<h2>Let's build something exceptional.</h2>
+		<div class="contact-links">
+			<a href="#" class="contact-link"><span>Email</span></a>
+			<a href="#" class="contact-link"><span>LinkedIn</span></a>
+			<a href="#" class="contact-link"><span>GitHub</span></a>
+		</div>
+	</section>
+
+	<!-- MODALS -->
+	<div id="modalOverlay" class="modal-overlay"></div>
+	<!-- your modal components here -->
+
+	<!-- SCRIPTS -->
+	<script src="js/device.js"></script>
+	<script src="js/portrait-webgl.js"></script>
+	<script src="js/app.js"></script>
+
+</body>
+
+</html>
